@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: crik-test
+data:
+  config.yaml: |-
+    imageDir: /etc/checkpoint
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crik-test
+  labels:
+    app: crik-test
+spec:
+  selector:
+    matchLabels:
+      app: crik-test
+  template:
+    metadata:
+      labels:
+        app: crik-test
+    spec:
+      containers:
+        - name: looper
+          image: <registry_instance_ip>:5000/crik-test:loop
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /etc/crik
+              name: crik-config
+            - mountPath: /etc/checkpoint
+              name: checkpoint-storage
+            - mountPath: /proc/sys/kernel/ns_last_pid
+              name: checkpoint-cap
+          env:
+            - name: KUBERNETES_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+      volumes:
+        - name: crik-config
+          configMap:
+            name: crik-test
+        - name: checkpoint-cap
+          hostPath:
+            path: /proc/sys/kernel/ns_last_pid
+            type: File
+        - name: checkpoint-storage
+          hostPath:
+            path: /path/to/checkpoint/dir/in/cluster

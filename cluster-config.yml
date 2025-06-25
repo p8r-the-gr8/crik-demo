@@ -1,0 +1,13 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."<registry_instance_ip>:5000"]
+      endpoint = ["http://<registry_instance_ip>:5000"]
+    [plugins."io.containerd.grpc.v1.cri".registry.configs."<registry_instance_ip>:5000"]
+      insecure_skip_verify = true
+nodes:
+- role: control-plane
+  extraMounts:
+  - hostPath: /path/to/checkpoint/dir/on/host
+    containerPath: /path/to/checkpoint/dir/in/cluster

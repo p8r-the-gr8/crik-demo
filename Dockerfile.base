@@ -1,0 +1,13 @@
+# A base image to configure crik
+# so other containers won't have to
+FROM alpine:edge
+
+# Install criu
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories 
+RUN apk add --no-cache criu
+
+# Install crik
+COPY --from=ghcr.io/qawolf/crik/crik:v0.1.2 /usr/local/bin/crik /usr/local/bin/crik
+
+# Set up entrypoint
+ENTRYPOINT ["crik", "run", "--"]

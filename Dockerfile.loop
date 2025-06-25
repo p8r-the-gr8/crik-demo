@@ -1,0 +1,8 @@
+# This is a sample for building
+# checkpointable containers
+FROM crik-test:base
+
+RUN echo 'i=0; while true; do echo $i; i=$(expr $i + 1); sleep 1; done' >> /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/bin/sh", "-c", "/entrypoint.sh"]
